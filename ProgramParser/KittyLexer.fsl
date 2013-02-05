@@ -1,0 +1,47 @@
+﻿{
+namespace Symbolic.Expressions
+open System
+open Symbolic.Expressions.Parser
+open Microsoft.FSharp.Text.Lexing
+open System.Text
+module Lexer =
+let ids = [ ("while", WHILE);
+            ("begin", BEGIN);
+            ("end",   END  );
+            ("do",    DO   );
+            ("if",    IF   );
+            ("then",  THEN );
+            ("else",  ELSE );
+            ("print", PRINT);
+          ]
+
+let idsMap = Map.ofList ids
+
+let ident lexbuf tokenText = 
+    if Map.containsKey tokenText idsMap
+    then Map.find tokenText idsMap
+    else ID tokenText
+
+let lexeme (lexbuf:Lexing.LexBuffer<byte>) = Encoding.UTF8.GetString lexbuf.Lexeme
+}
+
+let num = ['0'-'9']
+let alpha = ['a'-'z''A'-'Z']
+let ident = alpha+(alpha|'_'|num)*
+let integer = '-'? num
+let whitespace = ' ' | '\t'
+let newline = '\n' | '\r''\n'
+
+rule token = parse
+    | whitespace    { token lexbuf }
+    | newline       { lexbuf.EndPos <- lexbuf.EndPos.NextLine; token lexbuf }
+    | "("           { LPAREN }
+    | ")"           { RPAREN }
+    | "+"           { PLUS }
+    | "-"           { MINUS }
+    | "*"           { TIMES }
+    | ";"           { SEMI }
+    | ":="          { ASSIGN }
+    | ident         { ident lexbuf (lexeme lexbuf) }
+    | integer       { INT (Int32.Parse(lexeme lexbuf)) }
+    | eof           { EOF }

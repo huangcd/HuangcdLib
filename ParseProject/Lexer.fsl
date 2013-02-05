@@ -1,0 +1,45 @@
+﻿{
+module Symbolic.Expressions.Lexer
+open Microsoft.FSharp.Text.Lexing
+open Parser
+open Ast
+open System.Text
+
+let lexeme (lexbuf:LexBuffer<byte>) = Encoding.UTF8.GetString lexbuf.Lexeme
+
+let parseSpecial (text:string) = 
+    match text with
+    | "+" -> ADD
+    | "-" -> SUB
+    | "*" -> MUL
+    | "/" -> DIV
+    | "^" -> HAT
+    | "(" -> LPAREN
+    | ")" -> RPAREN
+    | e   -> failwith ("Invalid operator " + e)
+
+let parseIdent (text:string) =
+    match text with
+    | "sin" -> SIN
+    | "cos" -> COS
+    | "e"   -> E
+    | "E"   -> E
+    | id    -> ID id
+}
+
+let digit   = ['0'-'9']
+let int     = digit+
+let alpha   = ['a'-'z''A'-'Z']
+let word    = alpha+ (alpha | digit | '_' )*
+let ws      = [' ''\t']+
+let nl      = '\n' | '\r''\n'
+let special = '+' | '-' | '*' | '/' | '(' | ')' | '^'
+
+rule parseToken = parse
+    | int     { lexeme lexbuf |> INT }
+    | ws      { parseToken lexbuf }
+    | nl      { parseToken lexbuf }
+    | special { parseSpecial (lexeme lexbuf) }
+    | word    { parseIdent (lexeme lexbuf) }
+    | eof     { EOF }
+    | _       { failwith (lexeme lexbuf) }

@@ -1,0 +1,6 @@
+﻿#I @"C:\Users\Chhuang\Documents\Visual Studio 2012\Projects\HuangcdLib\ProgramParser"
+#I @"C:\Users\Chhuang\Documents\Visual Studio 2012\Projects\HuangcdLib\packages\FSPowerPack.Core.Community.3.0.0.0\Lib\Net40"
+#r "FSharp.PowerPack.dll"
+#load "AST.fs"
+#load "KittyParser.fs"
+#load "KittyLexer.fs"
